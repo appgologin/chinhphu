@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>eBay User Checker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>eBay User Checker</h1>
+        <div class="input-group">
+            <label for="proxy">Proxy (optional):</label>
+            <input type="text" id="proxy" placeholder="host:port">
+        </div>
+        <div class="input-group">
+            <label for="userList">User List:</label>
+            <textarea id="userList" rows="5" placeholder="Enter eBay usernames, one per line"></textarea>
+        </div>
+        <button id="startButton">Bắt đầu kiểm tra</button>
+        <div id="status"></div>
+        <table id="resultTable">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Status</th>
+                    <th>Listing</th>
+                    <th>Feedback Score</th>
+                    <th>Member Since</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <script src="renderer.js"></script>
+</body>
+
+</html>
