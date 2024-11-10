@@ -1,39 +1,108 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <title>eBay User Checker</title>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
+    <title>String Filtering Form</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
 </head>
-
-<body>
+<body ng-app="filterApp" ng-controller="FilterController">
     <div class="container">
-        <h1>eBay User Checker</h1>
-        <div class="input-group">
-            <label for="proxy">Proxy (optional):</label>
-            <input type="text" id="proxy" placeholder="host:port">
-        </div>
-        <div class="input-group">
-            <label for="userList">User List:</label>
-            <textarea id="userList" rows="5" placeholder="Enter eBay usernames, one per line"></textarea>
-        </div>
-        <button id="startButton">Bắt đầu kiểm tra</button>
-        <div id="status"></div>
-        <table id="resultTable">
-            <thead>
-                <tr>
-                    <th>Username</th>
-                    <th>Status</th>
-                    <th>Listing</th>
-                    <th>Feedback Score</th>
-                    <th>Member Since</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
-    <script src="renderer.js"></script>
-</body>
+        <h2>String Filtering Form</h2>
+        <form class="form-horizontal" name="cms_filter_form" novalidate>  
+            <!-- Danh sách chuỗi (Input List) -->
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Danh sách chuỗi</label>
+                <div class="col-sm-8">
+                    <textarea style="height:150px;white-space:pre;overflow-wrap:normal;" 
+                              class="form-control" 
+                              ng-model="formData.inputList" 
+                              placeholder="Nhập mỗi chuỗi trên một dòng" required>
+                    </textarea>
+                </div>
+            </div>
 
+            <!-- Ký tự cần có trong chuỗi (Filter Keywords) -->
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Ký tự cần có trong chuỗi</label>
+                <div class="col-sm-8">
+                    <textarea style="height:100px;white-space:pre;overflow-wrap:normal;" 
+                              class="form-control" 
+                              ng-model="formData.mustHaveKeywords" 
+                              placeholder="Nhập mỗi ký tự hoặc từ cần có trên một dòng">
+                    </textarea>
+                </div>
+            </div>
+
+            <!-- Ký tự không muốn nhận trong chuỗi (Exclude Keywords) -->
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Ký tự không muốn nhận trong chuỗi</label>
+                <div class="col-sm-8">
+                    <textarea style="height:100px;white-space:pre;overflow-wrap:normal;" 
+                              class="form-control" 
+                              ng-model="formData.excludeKeywords" 
+                              placeholder="Nhập mỗi ký tự hoặc từ không muốn có trên một dòng">
+                    </textarea>
+                </div>
+            </div>
+
+            <!-- Filter Button -->
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-8">
+                    <button type="button" ng-click="filterStrings()" 
+                            class="btn btn-primary btn-block">Lọc chuỗi</button>
+                </div>
+            </div>
+
+            <!-- Output Section (Filtered Result) -->
+            <div class="form-group" ng-if="formData.outputList.length > 0">
+                <label class="col-sm-2 control-label">Kết quả</label>
+                <div class="col-sm-8">
+                    <textarea style="height:150px;white-space:pre;overflow-wrap:normal;" 
+                              class="form-control" 
+                              ng-model="formData.outputList" 
+                              readonly>
+                    </textarea>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // AngularJS application
+        angular.module('filterApp', [])
+            .controller('FilterController', ['$scope', function($scope) {
+                // Initialize form data
+                $scope.formData = {
+                    inputList: '',
+                    mustHaveKeywords: '',
+                    excludeKeywords: '',
+                    outputList: ''
+                };
+
+                // Function to filter strings
+                $scope.filterStrings = function() {
+                    // Get each line as an array
+                    const inputLines = $scope.formData.inputList.split('\n').map(line => line.trim()).filter(line => line !== '');
+                    const mustHaveKeywords = $scope.formData.mustHaveKeywords.split('\n').map(word => word.trim()).filter(word => word !== '');
+                    const excludeKeywords = $scope.formData.excludeKeywords.split('\n').map(word => word.trim()).filter(word => word !== '');
+
+                    // Filter lines based on must-have and exclude keywords
+                    const filteredLines = inputLines.filter(line => {
+                        // Check if line contains at least one of the must-have keywords
+                        const containsMustHave = mustHaveKeywords.length === 0 || mustHaveKeywords.some(keyword => line.includes(keyword));
+                        // Check if line does not contain any of the exclude keywords
+                        const doesNotContainExclude = excludeKeywords.every(keyword => !line.includes(keyword));
+                        
+                        // Include the line if it meets both conditions
+                        return containsMustHave && doesNotContainExclude;
+                    });
+
+                    // Update the output list with filtered lines
+                    $scope.formData.outputList = filteredLines.join('\n');
+                };
+            }]);
+    </script>
+</body>
 </html>
